@@ -7,4 +7,4 @@ router.delete("/", SubscribeController.delete);
 router.get("/", SubscribeController.get);
 
 // export default router;
-export { router };
+export { router as subscribeRouter };

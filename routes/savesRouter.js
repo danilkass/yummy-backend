@@ -7,4 +7,4 @@ router.get("/", SavesController.get);
 router.delete("/", SavesController.delete);
 
 // export default router;
-export { router };
+export { router as savesRouter };

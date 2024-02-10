@@ -7,4 +7,4 @@ router.patch("/", PostReactionController.update);
 router.delete("/", PostReactionController.delete);
 
 // export default router;
-export { router };
+export { router as postReactionRouter };

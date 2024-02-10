@@ -8,4 +8,4 @@ router.delete("/", CommentController.delete);
 router.patch("/", CommentController.update);
 
 // export default router;
-export { router };
+export { router as commentRouter };

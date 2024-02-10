@@ -10,4 +10,4 @@ router.delete("/", postController.delete);
 router.patch("/", postController.update);
 
 // export default router;
-export { router };
+export { router as postRouter };

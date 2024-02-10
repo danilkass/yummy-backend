@@ -8,4 +8,4 @@ router.post("/registration", UserController.registration);
 router.get("/auth", UserController.check);
 router.patch("/", UserController.update);
 
-export { router };
+export { router as userRouter };

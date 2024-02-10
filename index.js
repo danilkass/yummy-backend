@@ -4,7 +4,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import router from "./routes/index.js";
-
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
@@ -18,6 +17,7 @@ const start = async () => {
   try {
     await mongoose.connect(process.env.MONGODB);
     console.log("MongoDB connected successfully!");
+
     app.listen(PORT, () => console.log(`Server started on PORT:${PORT}`));
   } catch (err) {
     console.error("Error starting server:", err);
