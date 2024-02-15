@@ -66,34 +66,42 @@ class PostController {
   }
   async update(req, res, next) {
     const { id } = req.params;
-    const { title, subtitle, youtubeUrl, text, userId, ingredients } = req.body;
-    let fileName = await imageUpload(req, "img", "post", next);
+    const { title, subtitle, youtubeUrl, img, text, ingredients } = req.body;
 
-    const post = await Post.findByIdAndUpdate(
-      id,
-      {
-        title: title,
-        subtitle: subtitle,
-        youtubeUrl: youtubeUrl,
-        text: text,
-        userId: userId,
-        img: fileName,
-      },
-      { new: true }
-    );
-    await Ingredient.deleteMany({ postId: id });
+    try {
+      let fileName = img;
+      if (req.files) {
+        fileName = await imageUpload(req, "img", "post", next);
+      }
 
-    let parsedIngredients = JSON.parse(ingredients);
-    parsedIngredients.forEach(async (i) => {
-      const newIngredient = new Ingredient({
-        name: i.name,
-        quantity: i.quantity,
-        postId: post._id,
+      const post = await Post.findByIdAndUpdate(
+        id,
+        {
+          title: title,
+          subtitle: subtitle,
+          youtubeUrl: youtubeUrl,
+          text: text,
+          img: fileName,
+        },
+        { new: true }
+      );
+
+      await Ingredient.deleteMany({ postId: id });
+      let parsedIngredients = JSON.parse(ingredients);
+      parsedIngredients.forEach(async (i) => {
+        const newIngredient = new Ingredient({
+          name: i.name,
+          quantity: i.quantity,
+          postId: post._id,
+        });
+        await newIngredient.save();
       });
-      await newIngredient.save();
-    });
 
-    res.json(post);
+      res.json(post);
+    } catch (error) {
+      next(ApiError.badRequest("Помилка при оновлені поста"));
+    }
   }
 }
+
 export const Controller = new PostController();
