@@ -20,7 +20,15 @@ const UserSchema = new mongoose.Schema(
       default: "user",
     },
     avatar: {
-      String,
+      type: String,
+    },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
+    dislikesCount: {
+      type: Number,
+      default: 0,
     },
   },
   {
@@ -41,6 +49,9 @@ const PostSchema = new mongoose.Schema(
     img: {
       type: String,
       required: true,
+    },
+    youtubeUrl: {
+      type: String,
     },
     text: {
       type: String,
