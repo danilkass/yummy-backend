@@ -14,6 +14,7 @@ router.post(
   UserController.registration
 );
 router.get("/auth", authMiddleware, UserController.check);
+router.get("/:id", UserController.getOne);
 router.patch("/", checkRoleMiddleware(["admin"]), UserController.changeRole);
 
 export { router as userRouter };

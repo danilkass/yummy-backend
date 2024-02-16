@@ -1,5 +1,5 @@
 import ApiError from "../error/ApiError.js";
-import { User } from "../models/models.js";
+import { Post, User, UserSave } from "../models/models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import imageUpload from "../utils/imageUpload.js";
@@ -36,6 +36,7 @@ class UserController {
       next(ApiError.badRequest(error.message));
     }
   }
+
   async login(req, res, next) {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
@@ -49,10 +50,24 @@ class UserController {
     const token = generateJwt(user);
     return res.json({ token });
   }
+
   async check(req, res, next) {
     const token = generateJwt(req.user.id, req.user.email, req.user.role);
     return res.json({ token });
   }
+
+  async getOne(req, res, next) {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      res.json("Такого корустувача не існує.");
+    } else {
+      res.json(user);
+    }
+  }
+
   async changeRole(req, res) {
     const { id, role } = req.body;
 

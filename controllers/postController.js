@@ -1,6 +1,7 @@
 import ApiError from "../error/ApiError.js";
 import { Post, Ingredient } from "../models/models.js";
 import imageUpload from "../utils/imageUpload.js";
+import isAuthorCheck from "../utils/isAuthorCheck.js";
 
 class PostController {
   async create(req, res, next) {
@@ -44,6 +45,7 @@ class PostController {
     const ingredients = await Ingredient.find({ postId: id });
     res.json({ post, ingredients });
   }
+
   async getAll(req, res, next) {
     try {
       let { limit, page } = req.query;
@@ -60,15 +62,33 @@ class PostController {
     }
   }
   async delete(req, res, next) {
-    const { id } = req.params;
-    const post = await Post.findByIdAndDelete(id);
-    res.json(post);
+    try {
+      const isAutor = await isAuthorCheck(req, res, next);
+      if (!isAutor) {
+        return next(ApiError.forbidden("Ви не є автором."));
+      }
+
+      const { id } = req.params;
+      await Post.findByIdAndDelete(id);
+      await Ingredient.deleteMany({ userId: id });
+
+      res.json("Пост успішно видалено");
+    } catch (error) {
+      next(ApiError(internal("При видалені поста сталася помилка")));
+    }
   }
+
   async update(req, res, next) {
     const { id } = req.params;
     const { title, subtitle, youtubeUrl, img, text, ingredients } = req.body;
 
     try {
+      const isAutor = await isAuthorCheck(req, res, next);
+
+      if (!isAutor) {
+        return next(ApiError.forbidden("Ви не є автором."));
+      }
+
       let fileName = img;
       if (req.files) {
         fileName = await imageUpload(req, "img", "post", next);

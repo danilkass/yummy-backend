@@ -22,14 +22,6 @@ const UserSchema = new mongoose.Schema(
     avatar: {
       type: String,
     },
-    likesCount: {
-      type: Number,
-      default: 0,
-    },
-    dislikesCount: {
-      type: Number,
-      default: 0,
-    },
   },
   {
     timestamps: true,
@@ -62,11 +54,20 @@ const PostSchema = new mongoose.Schema(
       ref: "UserSchema", // Связь с моделью Users
       required: true,
     },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
+    dislikesCount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
   }
 );
+
 const IngredientSchema = new mongoose.Schema({
   postId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -82,6 +83,7 @@ const IngredientSchema = new mongoose.Schema({
     required: true,
   },
 });
+
 const CommentSchema = new mongoose.Schema(
   {
     userId: {
@@ -120,6 +122,7 @@ const CommentReactionSchema = new mongoose.Schema({
     required: true,
   },
 });
+
 const UserSaveSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -132,6 +135,7 @@ const UserSaveSchema = new mongoose.Schema({
     required: true,
   },
 });
+
 const PostReactionSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -148,14 +152,14 @@ const PostReactionSchema = new mongoose.Schema({
     required: true,
   },
 });
+
 const SubscriberSchema = new mongoose.Schema({
-  id: {
+  targetUser: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    unique: true,
   },
-  userid: {
-    type: String,
+  subscriber: {
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
 });
