@@ -1,5 +1,5 @@
 import ApiError from "../error/ApiError.js";
-import { Post, User, UserSave } from "../models/models.js";
+import { User, UserSave } from "../models/models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import imageUpload from "../utils/imageUpload.js";
@@ -60,15 +60,21 @@ class UserController {
     const { id } = req.params;
 
     const user = await User.findById(id);
+    const userSaves = await UserSave.find({ userId: id });
+    const userSubscribers = await Subscriber.find({ targetUser: id });
+
+    if (userSaves.length === 0) {
+      return res.json({ user, message: "У користувача немає збережених записів." });
+    }
 
     if (!user) {
       res.json("Такого корустувача не існує.");
     } else {
-      res.json(user);
+      res.json({ user, userSaves, userSubscribers });
     }
   }
 
-  async changeRole(req, res) {
+  async changeRole(req, res, next) {
     const { id, role } = req.body;
 
     const updatedUser = await User.findOneAndUpdate(
@@ -78,7 +84,7 @@ class UserController {
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ error: "Користувача не знайдено." });
+      next(ApiError.badRequest("Користувача не знайдено."));
     }
     res.json(updatedUser);
   }
