@@ -1,3 +1,5 @@
+import { UserSave } from "../models/models.js";
+import ApiError from "../error/ApiError.js";
 class SavesController {
   async create(req, res, next) {
     try {
@@ -15,7 +17,15 @@ class SavesController {
       next(ApiError.badRequest(error.message));
     }
   }
-  async delete(req, res, next) {}
-  async get(req, res) {} //getOne or getAll?
+  async delete(req, res, next) {
+    try {
+      const { id } = req.body;
+      await UserSave.findByIdAndDelete(id);
+      console.log(id);
+      res.json({ message: "Успішно видалено" });
+    } catch (error) {
+      next(ApiError.internal("При видалені сталася помилка"));
+    }
+  }
 }
 export const Controller = new SavesController();

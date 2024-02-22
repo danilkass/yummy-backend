@@ -4,6 +4,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import checkRoleMiddleware from "../middleware/checkRoleMiddleware.js";
 import validationMiddleware from "../middleware/validationMiddleware.js";
 import { authValidation, registrationValidation } from "../validations/index.js";
+import { Controller as SavesController } from "../controllers/savesController.js";
 
 const router = new Router();
 
