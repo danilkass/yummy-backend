@@ -21,7 +21,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(fileUpload({}));
-app.use(express.static(resolve(__dirname, "static", "post")));
+app.use("/staticfiles", express.static(resolve(__dirname, "static")));
+app.use("/postfiles", express.static(resolve(__dirname, "static", "post")));
+app.use("/userfiles", express.static(resolve(__dirname, "static", "userAvatar")));
 app.use("/api", router);
 
 //---------------------------------------

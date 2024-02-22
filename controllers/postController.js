@@ -1,5 +1,5 @@
 import ApiError from "../error/ApiError.js";
-import { Post, Ingredient } from "../models/models.js";
+import { Post, Ingredient, User } from "../models/models.js";
 import imageUpload from "../utils/imageUpload.js";
 import isAuthorCheck from "../utils/isAuthorCheck.js";
 
@@ -43,24 +43,51 @@ class PostController {
     const { id } = req.params;
     const post = await Post.findById(id);
     const ingredients = await Ingredient.find({ postId: id });
-    res.json({ post, ingredients });
+    const user = await User.find({ _id: post.userId });
+
+    res.json({ post, user, ingredients });
   }
 
+  //   async getAll(req, res, next) {
+  //     try {
+  //       let { limit, page } = req.query;
+  //       page = page || 1;
+  //       limit = limit || 100;
+  //       let offset = page * limit - limit;
+
+  //       const count = await Post.countDocuments();
+  //       const posts = await Post.find().skip(offset).limit(limit);
+
+  //       res.json({ count, posts });
+  //     } catch (error) {
+  //       next(ApiError.internal(error.message));
+  //     }
+  //   }
   async getAll(req, res, next) {
     try {
       let { limit, page } = req.query;
       page = page || 1;
-      limit = limit || 10;
+      limit = limit || 100;
       let offset = page * limit - limit;
 
       const count = await Post.countDocuments();
-      const posts = await Post.find().skip(offset).limit(limit);
+      const set = await Post.find().skip(offset).limit(limit);
 
+      const posts = await Promise.all(
+        set.map(async (post) => {
+          const ingredients = await Ingredient.find({ postId: post._id });
+          const user = await User.find({ _id: post.userId });
+          return { post, user, ingredients };
+        })
+      );
+
+      console.log(posts);
       res.json({ count, posts });
     } catch (error) {
       next(ApiError.internal(error.message));
     }
   }
+
   async delete(req, res, next) {
     try {
       const isAutor = await isAuthorCheck(req, res, next);
