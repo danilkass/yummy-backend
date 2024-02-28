@@ -1,25 +1,36 @@
+import { validationResult } from "express-validator";
 import ApiError from "../error/ApiError.js";
 import { Post, Ingredient, User } from "../models/models.js";
 import imageUpload from "../utils/imageUpload.js";
 import isAuthorCheck from "../utils/isAuthorCheck.js";
+import jwt from "jsonwebtoken";
 
 class PostController {
   async create(req, res, next) {
-    const { title, subtitle, youtubeUrl, text, userId, ingredients } = req.body;
+    const { title, subtitle, youtubeUrl, text, ingredients } = req.body;
 
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const token = req.headers.authorization.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.SECRET_KEY);
+
       let fileName = await imageUpload(req, "img", "post", next);
       if (!fileName) {
         next(ApiError.badRequest("Обов'язкове зображення!"));
         return;
       }
+
       const newPost = new Post({
         title: title,
         subtitle: subtitle,
         img: fileName,
         youtubeUrl: youtubeUrl,
         text: text,
-        userId: userId,
+        userId: decoded.id,
       });
       await newPost.save();
 
@@ -39,13 +50,23 @@ class PostController {
     }
   }
 
-  async getOne(req, res) {
+  async getOne(req, res, next) {
     const { id } = req.params;
-    const post = await Post.findById(id);
-    const ingredients = await Ingredient.find({ postId: id });
-    const user = await User.find({ _id: post.userId });
 
-    res.json({ post, user, ingredients });
+    try {
+      const post = await Post.findById(id);
+      const ingredients = await Ingredient.find({ postId: id });
+      const user = await User.find({ _id: post.userId });
+
+      if (!post) {
+        return res.status(404).json({ message: "Пост не знайдено" });
+      }
+
+      res.json({ post, user, ingredients });
+      await Post.findByIdAndUpdate(id, { $inc: { viewsCount: 1 } });
+    } catch (error) {
+      next(ApiError.badRequest(error.message));
+    }
   }
 
   //   async getAll(req, res, next) {
@@ -58,7 +79,7 @@ class PostController {
   //       const count = await Post.countDocuments();
   //       const posts = await Post.find().skip(offset).limit(limit);
 
-  //       res.json({ count, posts });
+  //   res.json({ count, posts });
   //     } catch (error) {
   //       next(ApiError.internal(error.message));
   //     }
@@ -81,7 +102,6 @@ class PostController {
         })
       );
 
-      console.log(posts);
       res.json({ count, posts });
     } catch (error) {
       next(ApiError.internal(error.message));
@@ -114,6 +134,11 @@ class PostController {
 
       if (!isAutor) {
         return next(ApiError.forbidden("Ви не є автором."));
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
       }
 
       let fileName = img;

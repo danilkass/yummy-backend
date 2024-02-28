@@ -17,7 +17,7 @@ const postValidation = [
       return true;
     }),
   body("text", "Текст поста обов'язковий для заповнення.").notEmpty(),
-  body("userId", "Ідентифікатор користувача обов'язковий для заповнення.").notEmpty(),
+  //   body("userId", "Ідентифікатор користувача обов'язковий для заповнення.").notEmpty(),
   body("ingredients", "Інгридиенти обов'язкові для заповнення.").optional().notEmpty(),
 ];
 

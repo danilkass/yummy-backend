@@ -7,4 +7,4 @@ const registrationValidation = [
   body("avatar").optional(),
 ];
 
-export default registrationValidation;
+export { registrationValidation };

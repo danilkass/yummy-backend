@@ -1,8 +1,14 @@
+import { validationResult } from "express-validator";
 import { Comment } from "../models/models.js";
 
 class CommentController {
   async create(req, res) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       const { userId, postId, comment } = req.body;
 
       const newComment = new Comment({
@@ -30,6 +36,11 @@ class CommentController {
   async update(req, res) {
     const { id, comment } = req.body;
 
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const updatedComment = await Comment.findOneAndUpdate(
       { _id: id },
       { comment: comment },
@@ -37,6 +48,7 @@ class CommentController {
     );
     res.json(updatedComment);
   }
+
   async get(req, res) {
     let { limit, page } = req.query;
     const { id } = req.params;

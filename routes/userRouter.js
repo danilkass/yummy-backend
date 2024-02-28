@@ -2,29 +2,23 @@ import { Router } from "express";
 import { Controller as UserController } from "../controllers/userController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import checkRoleMiddleware from "../middleware/checkRoleMiddleware.js";
-import validationMiddleware from "../middleware/validationMiddleware.js";
-import { authValidation, registrationValidation } from "../validations/index.js";
-import { Controller as SavesController } from "../controllers/savesController.js";
+import { registrationValidation } from "../validations/registrationValidation.js";
+// import registrationValidation from "../validations/registrationValidation.js";
 
 const router = new Router();
 
-router.post("/login", UserController.login);
 router.post(
-  "/registration",
-  validationMiddleware(registrationValidation),
-  UserController.registration
+  "/login",
+  //  authValidation,
+  UserController.login
 );
-router.get(
-  "/auth",
-  authMiddleware,
-  validationMiddleware(authValidation),
-  UserController.check
-);
+router.post("/registration", registrationValidation, UserController.registration);
+router.get("/auth", authMiddleware, UserController.check);
 router.get("/:id", UserController.getOne);
 router.patch(
   "/",
   checkRoleMiddleware(["admin"]),
-  validationMiddleware(registrationValidation),
+  //   registrationValidation,
   UserController.changeRole
 );
 

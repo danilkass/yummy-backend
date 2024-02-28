@@ -3,9 +3,13 @@ import { User, UserSave } from "../models/models.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import imageUpload from "../utils/imageUpload.js";
+import { validationResult } from "express-validator";
 
-const generateJwt = ({ email, id, role }) => {
-  return jwt.sign({ id, email, role }, process.env.SECRET_KEY, { expiresIn: "24h" });
+const generateJwt = ({ email, id, role, avatar }) => {
+  console.log(
+    jwt.sign({ id, email, role, avatar }, process.env.SECRET_KEY, { expiresIn: "24h" })
+  );
+  return jwt.sign({ id, email, role, avatar }, process.env.SECRET_KEY, { expiresIn: "24h" });
 };
 
 class UserController {
@@ -13,6 +17,11 @@ class UserController {
     const { name, email, password } = req.body;
 
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       let fileName = await imageUpload(req, "avatar", "userAvatar", next);
 
       const candidate = await User.findOne({ email });
@@ -21,16 +30,16 @@ class UserController {
       }
       const hashPassword = await bcrypt.hash(password, 5);
 
-      const newUser = new User({
+      const user = new User({
         name: name,
         email: email,
         password: hashPassword,
         avatar: fileName,
       });
-      await newUser.save();
+      await user.save();
 
-      const token = generateJwt(newUser);
-      res.json(token);
+      const token = generateJwt(user);
+      res.json({ user, token });
     } catch (error) {
       // Обработка ошибок при сохранении пользователя
       next(ApiError.badRequest(error.message));
@@ -48,12 +57,19 @@ class UserController {
       return next(ApiError.unauthorized("Не вірний пароль."));
     }
     const token = generateJwt(user);
-    return res.json({ token });
+    console.log(user);
+    return res.json({ user, token });
   }
 
   async check(req, res, next) {
-    const token = generateJwt(req.user.id, req.user.email, req.user.role);
-    return res.json({ token });
+    // const { id, email, name, ro } = req.body;
+
+    const token = generateJwt(req.user);
+    const user = await User.findOne({ email: req.user.email });
+
+    console.log(req.user.email, req.user.id, req.user.role, req.user.avatar);
+
+    return res.json({ user, token });
   }
 
   async getOne(req, res, next) {

@@ -62,6 +62,10 @@ const PostSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    viewsCount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
@@ -81,6 +85,9 @@ const IngredientSchema = new mongoose.Schema({
   quantity: {
     type: String,
     required: true,
+  },
+  number: {
+    type: Number,
   },
 });
 
