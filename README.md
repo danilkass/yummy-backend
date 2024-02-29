@@ -1,5 +1,5 @@
-In the project directory, you can run:
+Install in the project directory:
 
-### npm install (можно просто npm i)
+### npm install
 ### npm run dev
-### 
+
