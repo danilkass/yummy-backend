@@ -1,6 +1,8 @@
 # Yummy - кулінарний блог
 Навчальний проект створенний за термін в 3 тижні
 
+https://yummy-blog.vercel.app/
+
 ## Stack технологій
 Backend:
 
