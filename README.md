@@ -28,7 +28,7 @@ Frontend:
 - npm install
 - npm run dev
 
-## Результат роботи программи:
+## Результат роботи програми:
 https://yummy-blog.vercel.app/
 
 ![image](https://github.com/danilkass/yummy-frontend/assets/111860815/66f118c0-19ab-4027-894e-430159457e78)
